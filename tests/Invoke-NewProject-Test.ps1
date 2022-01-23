@@ -2,4 +2,4 @@ $command = $MyInvocation.MyCommand.Source.Replace("-Test","").Replace("tests","f
 
 . $command
 
-Invoke-NewProject -ProjectPath 'e:\_DQM' -ProjectName Example2 
+Invoke-NewProject -ProjectPath 'e:\_DQM' -ProjectName Example3 
