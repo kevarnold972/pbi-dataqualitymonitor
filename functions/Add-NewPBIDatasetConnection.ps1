@@ -1,4 +1,4 @@
-function Invoke-NewPBIDatasetConnection {
+function Add-NewPBIDatasetConnection {
     <#
     .SYNOPSIS
         Create a Power BI dataset connection
@@ -23,7 +23,7 @@ function Invoke-NewPBIDatasetConnection {
     .LINK
         https://github.com/kevarnold972/pbi-dataqualitymonitor
     .EXAMPLE
-        Invoke-NewPBIDatasetConnection -Config $Config -ConnectionName DevWorkspace-Contoso -DatasetID 56189fd8-4d86-456c-a849-d6e8d1268e5f
+        Add-NewPBIDatasetConnection -Config $Config -ConnectionName DevWorkspace-Contoso -DatasetID 56189fd8-4d86-456c-a849-d6e8d1268e5f
         
 	#>
     [CmdletBinding()]

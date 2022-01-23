@@ -1,4 +1,4 @@
-function Invoke-DeleteDatasetConnection {
+function Remove-DatasetConnection {
     <#
     .SYNOPSIS
         Removes the dataset Connection from the project
@@ -20,7 +20,7 @@ function Invoke-DeleteDatasetConnection {
     .LINK
         https://github.com/kevarnold972/pbi-dataqualitymonitor
     .EXAMPLE
-        Invoke-DeleteDatasetConnection -Config $Config -ConnectionName DevWorkspace-Contoso
+        Remove-DatasetConnection -Config $Config -ConnectionName DevWorkspace-Contoso
         
 	#>
     [CmdletBinding()]

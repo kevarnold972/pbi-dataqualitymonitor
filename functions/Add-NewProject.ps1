@@ -1,4 +1,4 @@
-function Invoke-NewProject {
+function Add-NewProject {
     <#
     .SYNOPSIS
         Create the root project directory
@@ -19,7 +19,7 @@ function Invoke-NewProject {
     .LINK
         https://github.com/kevarnold972/pbi-dataqualitymonitor
     .EXAMPLE
-        Invoke-NewProject -ProjectPath 'c:\DQM' -ProjectName Example1 
+        Add-NewProject -ProjectPath 'c:\DQM' -ProjectName Example1 
         
 	#>
     [CmdletBinding()]

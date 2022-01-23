@@ -1,4 +1,4 @@
-function Invoke-NewQueriesEqualTest {
+function Add-NewQueriesEqualTest {
     <#
     .SYNOPSIS
         Create a equal compare test
@@ -33,7 +33,7 @@ function Invoke-NewQueriesEqualTest {
     .LINK
         https://github.com/kevarnold972/pbi-dataqualitymonitor
     .EXAMPLE
-        Invoke-NewQueriesEqualTest -Config $Config -TestName OrderCount-DevProd-Match`
+        Add-NewQueriesEqualTest -Config $Config -TestName OrderCount-DevProd-Match`
                 -Query1ConnectionName DevWorkspace-Contoso -Query1Name ordercount.dax `
                 -Query2ConnectionName ProdWorkspace-Contoso -Query2Name ordercount.dax
         

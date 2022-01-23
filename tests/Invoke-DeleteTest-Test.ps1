@@ -5,4 +5,4 @@ $ModulePath = $ModulePath + "\\DataQualityMonitor.psm1"
 Import-Module $ModulePath -Force
 
 $Config = Get-ProjectConfig -ProjectPath 'e:\_DQM' -ProjectName Example3 
-Invoke-DeleteTest  -Config $Config -TestName Test1
+Remove-Test  -Config $Config -TestName Test1

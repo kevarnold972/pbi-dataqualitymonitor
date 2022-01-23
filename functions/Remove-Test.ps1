@@ -1,4 +1,4 @@
-function Invoke-DeleteTest {
+function Remove-Test {
     <#
     .SYNOPSIS
         Removes the Test from the project
@@ -19,7 +19,7 @@ function Invoke-DeleteTest {
     .LINK
         https://github.com/kevarnold972/pbi-dataqualitymonitor
     .EXAMPLE
-        Invoke-DeleteTest -Config $Config -TestName Test1
+        Remove-Test -Config $Config -TestName Test1
         
 	#>
     [CmdletBinding()]

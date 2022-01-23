@@ -5,4 +5,4 @@ $ModulePath = $ModulePath + "\\DataQualityMonitor.psm1"
 Import-Module $ModulePath -Force
 
 $Config = Get-ProjectConfig -ProjectPath 'e:\_DQM' -ProjectName Example3 
-Invoke-DeleteDatasetConnection -Debug -Config $Config -ConnectionName DevWorkspace-Contoso
+Remove-DatasetConnection  -Config $Config -ConnectionName DevWorkspace-Contoso
