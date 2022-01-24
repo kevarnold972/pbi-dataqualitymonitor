@@ -78,16 +78,16 @@ function Add-NewQueriesEqualTest {
 {
     "TestName": $TestNamejson,
     "Type": "Equal",
-    "Queries":  {
-        "Query1": {
+    "Queries":  [
+         {
             "ConnectionName": $Connection1Json,
             "QueryFile": $Query1Json
         },
-        "Query2": {
+         {
             "ConnectionName": $Connection2Json,
             "QueryFile": $Query2Json
         }
-    }
+    ]
 }
 "@
         $TestTemplate | Out-File -FilePath $TestFile 

@@ -1,1 +1,3 @@
 tests/DataQualityMonitor.psm1
+Scrachpad.ps1
+tests/Secret-*.ps1
