@@ -83,7 +83,7 @@ function Get-AllTest {
         $RootPath = $Config.RootPath 
         $TestsFolder = $Config.TestFolder
         $TestPath = $RootPath + "\" + $TestsFolder 
-        Write-Debug $TestFile
+        Write-Debug "Test File to get " $TestFile
 
         if ( ! (Test-Path -Path $TestPath )) {
             Throw "The Test Folder does not exists"

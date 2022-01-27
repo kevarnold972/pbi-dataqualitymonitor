@@ -65,6 +65,8 @@ function Add-NewQueriesEqualTest {
         if (Test-Path -Path $TestFile) {
             Throw "Test already exists"
         }
+
+        #TODO - Verify Connection and Query file exists
     }
 
     Process {

@@ -45,7 +45,7 @@ function Get-Query {
     }
 
     End {
-        $Query = Get-Content $QueryFile 
+        $Query = Get-Content $QueryFile | Out-String
         return $Query
     }
 
