@@ -203,6 +203,8 @@ function Add-NewQueriesEqualTest {
         if (Test-Path -Path $TestFile) {
             Throw "Test already exists"
         }
+
+        #TODO - Verify Connection and Query file exists
     }
 
     Process {
@@ -440,7 +442,7 @@ function Get-Query {
     }
 
     End {
-        $Query = Get-Content $QueryFile 
+        $Query = Get-Content $QueryFile | Out-String
         return $Query
     }
 
@@ -584,7 +586,7 @@ function Get-AllTest {
         $RootPath = $Config.RootPath 
         $TestsFolder = $Config.TestFolder
         $TestPath = $RootPath + "\" + $TestsFolder 
-        Write-Debug $TestFile
+        Write-Debug $TestPath
 
         if ( ! (Test-Path -Path $TestPath )) {
             Throw "The Test Folder does not exists"
@@ -724,14 +726,14 @@ function Invoke-Test {
         The test will be executed using the provided connection and results will be returned and
         saved in the file 
 
-    .PARAMETER Connection
-        The Connection object returned by Get-Connection 
+    .PARAMETER Config
+        The Config object returned by Get-ProjectConfig 
 
-	.PARAMETER Query
-        The Query Test returned from Get-Query
+	.PARAMETER TestName
+        The Test name to run
 
-    .PARAMETER ResultsFileName
-        The full path file name to save the results as json
+    .PARAMETER RunID
+        The execution run this is associated with
 
 	.NOTES
         Tags: 
@@ -741,92 +743,73 @@ function Invoke-Test {
     .LINK
         https://github.com/kevarnold972/pbi-dataqualitymonitor
     .EXAMPLE
-        Invoke-Query -Connection $Connection -Query "evalute table" -ResultsFileName "E:\_DQM\Example3\runs\rundate\connectionamequeryname.json"
+        Invoke-Test -Config $Config -TestName Test1 -RunID "Run01"
         
 	#>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [object] $Connection,
+        [object] $Config,
         [Parameter(Mandatory = $true)]
-        [string] $Query,
+        [string] $TestName,
         [Parameter(Mandatory = $true)]
-        [string] $ResultsFileName
+        [string] $RunID
     )
 
     End {
-       
-        switch ($Connection.Type) {
-            "PowerBI" { 
-                $DatasetID = $Connection.DatasetID
-                $Result = Invoke-PowerBIQuery -DatasetID $DatasetID -Query $Query
-                break
-             }
-            Default {Throw "Connection type is not implemented"; break}
+
+        
+        $RunPath = $Config.RootPath + "\" + $Config.RunsFolder + "\" + $RunID
+
+        if ( ! (Test-Path -Path $RunPath )) {
+            New-Item -Path $RunPath -ItemType Directory | Out-Null
+        }
+        
+        $Test = Get-Test -Config $Config -TestName $TestName
+        
+        $QryResults = [System.Collections.ArrayList]::new()
+        foreach ($q in $Test.Queries) {
+            
+            $Connection = Get-Connection -Config $Config -ConnectionName $q.ConnectionName
+            $QueryFileName = $q.QueryFile
+            
+            $Query = Get-Query -Config $Config -QueryName $QueryFileName 
+            
+            $ResultFileName = $RunPath + "\" + $Test.TestName + "-qry-" + `
+                                $Connection.ConnectionName + "-" + $q.QueryFile + ".json"
+            $QryResult = Invoke-Query -Connection $Connection -Query $Query -ResultsFileName $ResultFileName
+            [void]$QryResults.Add($QryResult)
         }
 
-        $Result | ConvertTo-Json | Out-File -FilePath $ResultsFileName 
-        return $Result
-    }
-
-} #End of Function
-
-function Invoke-PowerBIQuery {
-    <#
-    .SYNOPSIS
-        Executes a PowerBI query 
-    .DESCRIPTION
-        The PowerBI Query will be executed and the first result set returned. This assumes the 
-        Power Bi Connection has already been established.  
-
-    .PARAMETER DatasetID
-        The Connection object returned by Get-Connection 
-
-	.PARAMETER Query
-        The Query string to be executed
-
-	.NOTES
-        Tags: 
-        Author:  Kevin Arnold
-        Twitter: https://twitter.com/kevarnold
-        License: MIT https://opensource.org/licenses/MIT
-    .LINK
-        https://github.com/kevarnold972/pbi-dataqualitymonitor
-    .EXAMPLE
-        Invoke-PowerBIQuery -DatasetID $DatasetID -Query "evalute table"
+        switch ($Test.Type) {
+            "equal" {  
+                $TestResult = if ($QryResults[0] -eq $QryResults[1]) {
+                    $true | ConvertTo-Json
+                } else {
+                    $false | ConvertTo-Json
+                }
+            }
+            Default {Throw "Test type is not implemented"; break}
+        }
+        $TestResultFileName = $RunPath + "\" + $Test.TestName + "-Result.json"
+        $ProjectName = $Config.ProjectName | ConvertTo-Json
+        $Rundate = Get-Date -Format "MM/dd/yyyy HH:mm" | ConvertTo-Json
+        $TestNameJson = $TestName | ConvertTo-Json
+        $RunIDJson = $RunID | ConvertTo-Json
         
-	#>
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [object] $DatasetID,
-        [Parameter(Mandatory = $true)]
-        [string] $Query
-    )
-
-    End {
-        $Queryjson = $Query | ConvertTo-Json 
-        Write-Debug $DatasetID
-        Write-Debug $Queryjson
-        
-        $PBIQuery = @"
+        $Resultjson = @"
 {
-    "queries": [
-        {
-        "query": $Queryjson
-        }
-    ]
-    }
+    "ProjectName": $ProjectName,
+    "TestName": $TestNameJson,
+    "RunID": $RunIDJson,
+    "RunDate": $Rundate,
+    "Result": $TestResult
+}
 "@
-        $URL = "https://api.powerbi.com/v1.0/myorg/datasets/" + $DatasetID + "/executeQueries"
-        $Result = Invoke-PowerBIRestMethod -Method POST -Url $URL -Body $PBIQuery | ConvertFrom-Json
-        $ReturnRows = $Result.results.tables.rows
-        return $ReturnRows
+    $Resultjson | Out-File -FilePath $TestResultFileName
     }
 
 } #End of Function
-
-
 function Remove-DatasetConnection {
     <#
     .SYNOPSIS

@@ -72,14 +72,16 @@ function Invoke-Test {
             Default {Throw "Test type is not implemented"; break}
         }
         $TestResultFileName = $RunPath + "\" + $Test.TestName + "-Result.json"
-        $ProjectName = $Config.ProjectName
-        $Rundate = (Get-Date).Date | ConvertTo-Json
+        $ProjectName = $Config.ProjectName | ConvertTo-Json
+        $Rundate = Get-Date -Format "MM/dd/yyyy HH:mm" | ConvertTo-Json
+        $TestNameJson = $TestName | ConvertTo-Json
+        $RunIDJson = $RunID | ConvertTo-Json
         
         $Resultjson = @"
 {
     "ProjectName": $ProjectName,
-    "TestName": $TestName,
-    "RunID": $RunID,
+    "TestName": $TestNameJson,
+    "RunID": $RunIDJson,
     "RunDate": $Rundate,
     "Result": $TestResult
 }
