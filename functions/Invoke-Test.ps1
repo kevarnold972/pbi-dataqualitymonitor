@@ -56,20 +56,23 @@ function Invoke-Test {
             $Query = Get-Query -Config $Config -QueryName $QueryFileName 
             
             $ResultFileName = $RunPath + "\" + $Test.TestName + "-qry-" + `
-                                $Connection.ConnectionName + "-" + $q.QueryFile + ".json"
+                $Connection.ConnectionName + "-" + $q.QueryFile + ".json"
             $QryResult = Invoke-Query -Connection $Connection -Query $Query -ResultsFileName $ResultFileName
             [void]$QryResults.Add($QryResult)
         }
 
         switch ($Test.Type) {
-            "equal" {  
-                $TestResult = if ($QryResults[0] -eq $QryResults[1]) {
+            "equal" {
+                $Query1 = $QryResults[0] | ConvertTo-Json
+                $Query2 = $QryResults[1] | ConvertTo-Json
+                $TestResult = if ($Query1 -eq $Query2) {
                     $true | ConvertTo-Json
-                } else {
+                }
+                else {
                     $false | ConvertTo-Json
                 }
             }
-            Default {Throw "Test type is not implemented"; break}
+            Default { Throw "Test type is not implemented"; break }
         }
         $TestResultFileName = $RunPath + "\" + $Test.TestName + "-Result.json"
         $ProjectName = $Config.ProjectName | ConvertTo-Json
@@ -86,7 +89,7 @@ function Invoke-Test {
     "Result": $TestResult
 }
 "@
-    $Resultjson | Out-File -FilePath $TestResultFileName
+        $Resultjson | Out-File -FilePath $TestResultFileName
     }
 
 } #End of Function
