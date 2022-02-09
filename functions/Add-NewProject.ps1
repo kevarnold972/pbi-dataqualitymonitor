@@ -67,6 +67,9 @@ function Add-NewProject {
 }
 "@
         $ConfigTemplate | Out-File -FilePath $ConfigFile 
+        $Config = Get-ProjectConfig -ProjectPath $ProjectPath -ProjectName $ProjectName
+        Add-StaticResultConnection  -Config $Config
     }
+    
 
 } #End of Function

@@ -61,6 +61,7 @@ function Invoke-Test {
             [void]$QryResults.Add($QryResult)
         }
 
+        
         switch ($Test.Type) {
             "equal" {
                 $Query1 = $QryResults[0] | ConvertTo-Json
@@ -71,9 +72,22 @@ function Invoke-Test {
                 else {
                     $false | ConvertTo-Json
                 }
+                break
+            }
+            "RowCountEqual" {
+                $QueryRowCount = $QryResults[0].Count
+                $ExpectedRowCount = $Test.ExpectedCount
+                $TestResult = if ($QueryRowCount -eq $ExpectedRowCount) {
+                    $true | ConvertTo-Json
+                }
+                else {
+                    $false | ConvertTo-Json
+                }
+                break
             }
             Default { Throw "Test type is not implemented"; break }
         }
+        
         $TestResultFileName = $RunPath + "\" + $Test.TestName + "-Result.json"
         $ProjectName = $Config.ProjectName | ConvertTo-Json
         $Rundate = Get-Date -Format "MM/dd/yyyy HH:mm" | ConvertTo-Json

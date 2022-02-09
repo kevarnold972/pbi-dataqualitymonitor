@@ -44,6 +44,10 @@ function Invoke-Query {
                 $Result = Invoke-PowerBIQuery -DatasetID $DatasetID -Query $Query
                 break
              }
+             "Static" { 
+                $Result = $Query | ConvertFrom-Json
+                break
+             }
             Default {Throw "Connection type is not implemented"; break}
         }
 
