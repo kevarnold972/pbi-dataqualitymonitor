@@ -133,7 +133,10 @@ function Add-NewProject {
 }
 "@
         $ConfigTemplate | Out-File -FilePath $ConfigFile 
+        $Config = Get-ProjectConfig -ProjectPath $ProjectPath -ProjectName $ProjectName
+        Add-StaticResultConnection  -Config $Config
     }
+    
 
 } #End of Function
 function Add-NewQueriesEqualTest {
@@ -231,6 +234,60 @@ function Add-NewQueriesEqualTest {
 }
 "@
         $TestTemplate | Out-File -FilePath $TestFile 
+    }
+
+} #End of Function
+function Add-StaticResultConnection {
+    <#
+    .SYNOPSIS
+        Create a Static Results connection
+    .DESCRIPTION
+        Create a Static Results connection that can be used in the project
+
+    .PARAMETER Config
+        The Config object returned by Get-ProjectConfig 
+
+	.NOTES
+        Tags: 
+        Author:  Kevin Arnold
+        Twitter: https://twitter.com/kevarnold
+        License: MIT https://opensource.org/licenses/MIT
+    .LINK
+        https://github.com/kevarnold972/pbi-dataqualitymonitor
+    .EXAMPLE
+        Add-StaticResultConnection -Config $Config
+        
+	#>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [object] $Config
+
+    )
+
+    
+
+    Begin {
+        $ConnectionName = "StaticResult"
+        $RootPath = $Config.RootPath 
+        $ConnectionsFolder = $Config.ConnectionsFolder 
+        $ConnectionFile = $RootPath + "\" + $ConnectionsFolder + "\" + $ConnectionName + ".json"
+        Write-Debug $ConnectionFile
+        if (Test-Path -Path $ConnectionFile) {
+            Throw "Connection already exists"
+        }
+    }
+
+    Process {
+        $Connectionjson = ConvertTo-Json $ConnectionName
+        $StaticConnectionTemplate =
+        @"
+{
+    "ConnectionName": $Connectionjson,
+    "Type": "Static"
+}
+"@
+        $StaticConnectionTemplate | Out-File -FilePath $ConnectionFile 
     }
 
 } #End of Function
@@ -651,6 +708,10 @@ function Invoke-Query {
             "PowerBI" { 
                 $DatasetID = $Connection.DatasetID
                 $Result = Invoke-PowerBIQuery -DatasetID $DatasetID -Query $Query
+                break
+             }
+             "Static" { 
+                $Result = $Query | ConvertFrom-Json
                 break
              }
             Default {Throw "Connection type is not implemented"; break}
